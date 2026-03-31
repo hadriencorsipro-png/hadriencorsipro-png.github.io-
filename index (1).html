@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mimidou Productions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --noir: #080808;
+    --blanc: #f0ebe4;
+    --or: #c9a96e;
+    --violet: #3d1f5e;
+    --violetc: #7b4fa6;
+    --gc: #767676;
+  }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--noir); color: var(--blanc);
+    font-family: 'Montserrat', sans-serif; font-weight: 300;
+    overflow-x: hidden; cursor: none;
+  }
+
+  .cursor {
+    width: 8px; height: 8px; background: var(--or); border-radius: 50%;
+    position: fixed; top: 0; left: 0; pointer-events: none; z-index: 9999;
+    transform: translate(-50%,-50%);
+  }
+  .cursor-ring {
+    width: 32px; height: 32px; border: 1px solid rgba(201,169,110,.3);
+    border-radius: 50%; position: fixed; top: 0; left: 0;
+    pointer-events: none; z-index: 9998; transform: translate(-50%,-50%);
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    padding: 24px 60px; display: flex; justify-content: space-between; align-items: center;
+    background: linear-gradient(to bottom, rgba(8,8,8,.97) 0%, transparent 100%);
+  }
+  .nav-logo { text-decoration: none; display: inline-block; }
+
+  /* Logo nav : MIMIDOU + ligne —PRODUCTIONS— alignée sur toute la largeur du mot */
+  .nav-logo-mimidou {
+    font-family: 'Bebas Neue', sans-serif; font-size: 20px;
+    letter-spacing: .12em; color: var(--blanc); display: block;
+    /* Le mot MIMIDOU fait la référence de largeur */
+  }
+  .nav-logo-prod-row {
+    display: flex; align-items: center; width: 100%; margin-top: 3px;
+  }
+  .nav-logo-prod-line {
+    flex: 1; height: 1px; background: var(--gc); opacity: .5;
+  }
+  .nav-logo-prod-text {
+    font-family: 'Montserrat', sans-serif; font-weight: 300;
+    font-size: 6px; letter-spacing: .45em; text-transform: uppercase;
+    color: var(--gc); padding: 0 5px; white-space: nowrap;
+  }
+
+  .nav-links { display: flex; gap: 30px; list-style: none; }
+  .nav-links a {
+    font-size: 10px; letter-spacing: .22em; text-transform: uppercase;
+    color: var(--gc); text-decoration: none; transition: color .3s;
+  }
+  .nav-links a:hover { color: var(--or); }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh; display: flex; flex-direction: column;
+    justify-content: flex-end; padding: 0 60px 90px;
+    position: relative; overflow: hidden;
+  }
+  .hero-bg {
+    position: absolute; inset: 0; z-index: 0;
+    background:
+      radial-gradient(ellipse 55% 70% at 65% 35%, rgba(61,31,94,.28) 0%, transparent 60%),
+      radial-gradient(ellipse 35% 50% at 20% 75%, rgba(201,169,110,.05) 0%, transparent 50%);
+  }
+  .hero-bg::after {
+    content: ''; position: absolute; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.04'/%3E%3C/svg%3E");
+    background-size: 180px; opacity: .7;
+  }
+  .hero-vignette {
+    position: absolute; inset: 0; z-index: 0;
+    background: radial-gradient(ellipse 100% 100% at 50% 50%, transparent 45%, rgba(8,8,8,.72) 100%);
+  }
+  .hero-content { position: relative; z-index: 1; }
+  .hero-label {
+    font-size: 10px; letter-spacing: .42em; text-transform: uppercase;
+    color: var(--or); margin-bottom: 20px;
+    opacity: 0; transform: translateY(18px); animation: fadeUp .8s .3s forwards;
+  }
+  .hero-logo-wrap {
+    opacity: 0; transform: translateY(40px); animation: fadeUp 1s .5s forwards;
+    /* display inline-block so the prod-row inherits the title's natural width */
+    display: inline-block;
+  }
+  .hero-mimidou {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(80px, 13vw, 170px);
+    line-height: .88; letter-spacing: .025em; color: var(--blanc);
+    display: block;
+    /* On force le wrapper à prendre exactement la largeur de ce texte */
+    white-space: nowrap;
+  }
+  /* La rangée —PRODUCTIONS— hérite de la largeur du parent = largeur de MIMIDOU */
+  .hero-prod-row {
+    display: flex; align-items: center;
+    width: 100%; /* 100% du parent inline-block = largeur de MIMIDOU */
+    margin-top: 8px;
+  }
+  .hero-prod-line { flex: 1; height: 1px; background: var(--blanc); opacity: .6; }
+  .hero-prod-text {
+    font-family: 'Montserrat', sans-serif; font-weight: 300;
+    font-size: clamp(7px, .75vw, 11px); letter-spacing: .65em;
+    text-transform: uppercase; color: var(--blanc); opacity: .6;
+    padding: 0 12px; white-space: nowrap;
+  }
+
+  .hero-desc {
+    margin-top: 44px; max-width: 460px;
+    font-size: 13px; line-height: 1.95; color: var(--gc); letter-spacing: .04em;
+    opacity: 0; transform: translateY(18px); animation: fadeUp .8s .95s forwards;
+  }
+  .hero-scroll {
+    position: absolute; right: 60px; bottom: 90px; z-index: 1;
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+    opacity: 0; animation: fadeUp .8s 1.3s forwards;
+  }
+  .hero-scroll span {
+    font-size: 9px; letter-spacing: .35em; text-transform: uppercase;
+    color: var(--gc); writing-mode: vertical-rl;
+  }
+  .scroll-line {
+    width: 1px; height: 55px;
+    background: linear-gradient(to bottom, var(--or), transparent);
+    animation: scrollPulse 2.2s ease-in-out infinite;
+  }
+
+  section { padding: 110px 60px; }
+  .section-label {
+    font-size: 10px; letter-spacing: .42em; text-transform: uppercase;
+    color: var(--or); margin-bottom: 14px;
+  }
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(42px, 6vw, 80px); letter-spacing: .04em; line-height: .95;
+  }
+  .divider { width: 48px; height: 1px; background: var(--or); margin: 28px 0; opacity: .55; }
+
+  /* PROJET */
+  .projet { background: #0b0910; }
+  .projet-inner {
+    max-width: 1100px; margin: 0 auto;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;
+  }
+  .projet-visuel { position: relative; aspect-ratio: 3/4; overflow: hidden; background: #07050f; }
+  .pv-bg {
+    position: absolute; inset: 0;
+    background: linear-gradient(175deg, #12082a 0%, #06040e 55%, #04030a 100%);
+  }
+  .pv-glow {
+    position: absolute; top: 30%; left: 50%; transform: translateX(-50%);
+    width: 70%; height: 50%;
+    background: radial-gradient(ellipse, rgba(123,79,166,.45) 0%, rgba(61,31,94,.18) 40%, transparent 70%);
+  }
+  .pv-waves { position: absolute; bottom: 0; left: 0; right: 0; height: 45%; }
+  .pv-waves svg { width: 100%; height: 100%; }
+  .pv-grain {
+    position: absolute; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)' opacity='.06'/%3E%3C/svg%3E");
+    background-size: 150px; pointer-events: none;
+  }
+  .pv-vignette {
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 80% 80% at 50% 50%, transparent 40%, rgba(4,3,10,.85) 100%);
+  }
+  .pv-overlay {
+    position: absolute; inset: 0; display: flex; flex-direction: column;
+    justify-content: flex-end; padding: 28px 30px;
+  }
+  .pv-titre {
+    font-family: 'Cormorant Garamond', serif; font-size: clamp(26px, 4vw, 38px);
+    font-weight: 300; font-style: italic; line-height: 1.05;
+    color: rgba(240,235,228,.85);
+  }
+  .pv-meta {
+    font-size: 10px; letter-spacing: .3em; text-transform: uppercase;
+    color: rgba(201,169,110,.6); margin-top: 8px;
+  }
+  .pv-badge {
+    position: absolute; top: 20px; right: 20px; padding: 5px 13px;
+    border: 1px solid rgba(123,79,166,.5); background: rgba(61,31,94,.35);
+    font-size: 9px; letter-spacing: .3em; text-transform: uppercase;
+    color: rgba(197,160,230,.8);
+  }
+  .film-title {
+    font-family: 'Cormorant Garamond', serif; font-size: clamp(32px, 4.5vw, 52px);
+    font-weight: 300; font-style: italic; line-height: 1.05; margin-bottom: 6px;
+  }
+  .film-real {
+    font-size: 11px; letter-spacing: .2em; text-transform: uppercase;
+    color: var(--gc); margin-bottom: 28px;
+  }
+  .film-real span { color: var(--blanc); }
+  .film-synopsis {
+    font-family: 'Cormorant Garamond', serif; font-size: clamp(15px, 1.7vw, 19px);
+    font-weight: 300; line-height: 1.72; color: rgba(240,235,228,.75);
+    border-left: 1px solid rgba(123,79,166,.4); padding-left: 20px;
+    margin-bottom: 30px; font-style: italic;
+  }
+  .film-suite {
+    display: inline-flex; align-items: center; gap: 14px;
+    font-size: 10px; letter-spacing: .32em; text-transform: uppercase;
+    color: rgba(201,169,110,.55);
+  }
+  .film-suite-line { width: 32px; height: 1px; background: var(--or); opacity: .4; }
+
+  /* MISSION */
+  .mission { background: #090909; }
+  .mission-inner {
+    max-width: 1100px; margin: 0 auto;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start;
+  }
+  .mission-body { font-size: 13px; line-height: 1.95; color: var(--gc); }
+  .mission-body p + p { margin-top: 16px; }
+  .mission-body strong { color: var(--blanc); font-weight: 400; }
+  .mission-quote {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(18px, 2.2vw, 26px); font-style: italic; font-weight: 300;
+    color: rgba(201,169,110,.7); line-height: 1.5;
+    border-left: 1px solid rgba(201,169,110,.3); padding-left: 20px;
+    margin-top: 32px;
+  }
+  .valeurs-grid {
+    display: grid; grid-template-columns: repeat(3,1fr); gap: 2px;
+    margin: 50px auto 0; max-width: 1100px;
+  }
+  .valeur-card {
+    padding: 38px 26px; background: #0f0f0f;
+    border-top: 1px solid rgba(201,169,110,.15); transition: background .3s;
+  }
+  .valeur-card:hover { background: #131313; }
+  .valeur-num { font-family: 'Bebas Neue', sans-serif; font-size: 40px; color: rgba(201,169,110,.1); line-height: 1; margin-bottom: 14px; }
+  .valeur-titre { font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--blanc); margin-bottom: 10px; }
+  .valeur-text { font-size: 12px; line-height: 1.82; color: var(--gc); }
+
+  /* ÉQUIPE */
+  .equipe { background: #0b0b0b; }
+  .equipe-inner { max-width: 1100px; margin: 0 auto; }
+  .equipe-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 60px; margin-top: 56px;
+  }
+  .membre { display: grid; grid-template-columns: 180px 1fr; gap: 32px; align-items: start; }
+
+  .portrait {
+    width: 180px; height: 230px;
+    position: relative; overflow: hidden; flex-shrink: 0;
+    background: #151515;
+  }
+  .portrait::after {
+    content: ''; position: absolute; inset: 0;
+    border: 1px solid rgba(201,169,110,.18); pointer-events: none; z-index: 2;
+  }
+  .portrait::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(201,169,110,.07) 0%, transparent 55%);
+    z-index: 1;
+  }
+  .portrait img {
+    width: 100%; height: 100%; object-fit: cover; display: block;
+  }
+  .portrait-initials {
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Bebas Neue', sans-serif; font-size: 44px;
+    letter-spacing: .08em; color: rgba(201,169,110,.18);
+  }
+  .portrait.violet { background: #12101a; }
+  .portrait.violet::before { background: linear-gradient(135deg, rgba(123,79,166,.1) 0%, transparent 55%); }
+  .portrait.violet::after { border-color: rgba(123,79,166,.22); }
+  .portrait.violet .portrait-initials { color: rgba(123,79,166,.22); }
+
+  .membre-name {
+    font-family: 'Bebas Neue', sans-serif; font-size: clamp(28px, 3.5vw, 44px);
+    letter-spacing: .04em; line-height: .92; margin-bottom: 8px;
+  }
+  .membre-role {
+    font-size: 10px; letter-spacing: .28em; text-transform: uppercase; margin-bottom: 16px;
+  }
+  .membre-role.or { color: rgba(201,169,110,.7); }
+  .membre-role.violet { color: rgba(123,79,166,.8); }
+  .membre-bio { font-size: 12px; line-height: 1.85; color: var(--gc); }
+
+  /* CONTACT */
+  .contact { text-align: center; position: relative; overflow: hidden; }
+  .contact::before {
+    content: ''; position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%,-50%); width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(61,31,94,.14) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .contact-inner { position: relative; z-index: 1; }
+  .contact-sub {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(15px, 2vw, 20px); font-style: italic; font-weight: 300;
+    color: var(--gc); margin-bottom: 34px;
+  }
+  .btn-contact {
+    display: inline-block; padding: 14px 44px; border: 1px solid var(--or);
+    font-size: 10px; letter-spacing: .38em; text-transform: uppercase;
+    color: var(--or); text-decoration: none; position: relative; overflow: hidden; transition: color .4s;
+  }
+  .btn-contact::before {
+    content: ''; position: absolute; inset: 0; background: var(--or);
+    transform: scaleX(0); transform-origin: left; transition: transform .4s ease; z-index: -1;
+  }
+  .btn-contact:hover { color: var(--noir); }
+  .btn-contact:hover::before { transform: scaleX(1); }
+
+  footer {
+    padding: 34px 60px; border-top: 1px solid rgba(255,255,255,.05);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .footer-logo { text-decoration: none; display: inline-block; }
+  .footer-mimidou {
+    font-family: 'Bebas Neue', sans-serif; font-size: 16px;
+    letter-spacing: .12em; color: rgba(240,235,228,.18); display: block;
+  }
+  .footer-prod-row {
+    display: flex; align-items: center; width: 100%; margin-top: 3px;
+  }
+  .footer-prod-line { flex: 1; height: 1px; background: rgba(118,118,118,.25); }
+  .footer-prod-text {
+    font-family: 'Montserrat', sans-serif; font-weight: 300; font-size: 5.5px;
+    letter-spacing: .4em; text-transform: uppercase;
+    color: rgba(118,118,118,.28); padding: 0 4px; white-space: nowrap;
+  }
+  footer p { font-size: 10px; letter-spacing: .1em; color: rgba(118,118,118,.4); }
+
+  @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+  @keyframes scrollPulse { 0%,100%{opacity:.3} 50%{opacity:1} }
+  .reveal { opacity: 0; transform: translateY(28px); transition: opacity .9s ease, transform .9s ease; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+  .d1 { transition-delay: .15s; }
+  .d2 { transition-delay: .3s; }
+  .d3 { transition-delay: .45s; }
+
+  @media (max-width: 900px) {
+    nav { padding: 18px 24px; }
+    .nav-links { display: none; }
+    section { padding: 70px 24px; }
+    .hero { padding: 0 24px 70px; }
+    .hero-scroll { display: none; }
+    .projet-inner, .mission-inner, .equipe-grid { grid-template-columns: 1fr; gap: 36px; }
+    .membre { grid-template-columns: 140px 1fr; gap: 24px; }
+    .portrait { width: 140px; height: 180px; }
+    .valeurs-grid { grid-template-columns: 1fr; }
+    footer { flex-direction: column; gap: 12px; text-align: center; }
+    .footer-logo { text-align: left; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cring"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">
+    <span class="nav-logo-mimidou">MIMIDOU</span>
+    <div class="nav-logo-prod-row">
+      <div class="nav-logo-prod-line"></div>
+      <span class="nav-logo-prod-text">PRODUCTIONS</span>
+      <div class="nav-logo-prod-line"></div>
+    </div>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#projet">Projet</a></li>
+    <li><a href="#mission">Mission</a></li>
+    <li><a href="#equipe">L'équipe</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-vignette"></div>
+  <div class="hero-content">
+    <p class="hero-label">Association de production audiovisuelle · Paris</p>
+    <div class="hero-logo-wrap">
+      <span class="hero-mimidou">MIMIDOU</span>
+      <div class="hero-prod-row">
+        <div class="hero-prod-line"></div>
+        <span class="hero-prod-text">PRODUCTIONS</span>
+        <div class="hero-prod-line"></div>
+      </div>
+    </div>
+    <p class="hero-desc">Accompagner les jeunes réalisateurs et réalisatrices dans la création de courts métrages, fiction et documentaire, avec exigence, liberté et engagement artistique.</p>
+  </div>
+  <div class="hero-scroll">
+    <div class="scroll-line"></div>
+    <span>Scroll</span>
+  </div>
+</section>
+
+<!-- PROJET -->
+<section class="projet" id="projet">
+  <div class="projet-inner">
+    <div class="projet-visuel reveal">
+      <div class="pv-bg"></div>
+      <div class="pv-glow"></div>
+      <div class="pv-waves">
+        <svg viewBox="0 0 400 240" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+          <path d="M0 60 Q50 30 100 55 Q150 80 200 45 Q250 10 300 48 Q350 86 400 50 L400 240 L0 240Z" fill="rgba(61,31,94,.2)"/>
+          <path d="M0 95 Q55 68 110 90 Q165 112 220 78 Q275 44 330 78 Q365 100 400 82 L400 240 L0 240Z" fill="rgba(40,18,68,.35)"/>
+          <path d="M0 130 Q60 108 120 128 Q180 148 240 118 Q300 88 360 118 Q385 130 400 120 L400 240 L0 240Z" fill="rgba(22,10,44,.55)"/>
+          <path d="M0 165 Q70 148 140 165 Q210 182 280 155 Q330 135 400 155 L400 240 L0 240Z" fill="rgba(10,5,22,.75)"/>
+          <g transform="translate(195,44)" opacity=".6">
+            <line x1="18" y1="0" x2="18" y2="48" stroke="rgba(197,160,230,.5)" stroke-width=".9"/>
+            <line x1="18" y1="4" x2="44" y2="17" stroke="rgba(197,160,230,.3)" stroke-width=".6"/>
+            <line x1="18" y1="13" x2="46" y2="27" stroke="rgba(197,160,230,.3)" stroke-width=".6"/>
+            <line x1="18" y1="6" x2="0" y2="22" stroke="rgba(197,160,230,.22)" stroke-width=".5"/>
+            <path d="M4 48 Q18 42 32 48 L28 58 L8 58Z" fill="rgba(123,79,166,.42)" stroke="rgba(197,160,230,.25)" stroke-width=".7"/>
+          </g>
+          <g transform="translate(110,15)" opacity=".28">
+            <ellipse cx="12" cy="6" rx="5" ry="6" fill="rgba(197,160,230,.6)"/>
+            <path d="M6 12 Q12 30 8 50" stroke="rgba(197,160,230,.5)" stroke-width="1.2" fill="none"/>
+            <path d="M18 12 Q14 30 16 50" stroke="rgba(197,160,230,.4)" stroke-width="1" fill="none"/>
+            <path d="M8 20 Q0 28 2 36" stroke="rgba(197,160,230,.3)" stroke-width=".8" fill="none"/>
+            <path d="M16 18 Q24 25 22 33" stroke="rgba(197,160,230,.3)" stroke-width=".8" fill="none"/>
+          </g>
+        </svg>
+      </div>
+      <div class="pv-grain"></div>
+      <div class="pv-vignette"></div>
+      <div class="pv-overlay">
+        <div class="pv-titre">Baiser du<br>Crépuscule</div>
+        <div class="pv-meta">Court métrage · Fiction · En production</div>
+      </div>
+      <div class="pv-badge">Projet en cours</div>
+    </div>
+
+    <div class="reveal d1">
+      <p class="section-label">Premier projet</p>
+      <h2 class="film-title">Baiser du<br>Crépuscule</h2>
+      <p class="film-real">Un film de <span>Lorenzo Rincon</span></p>
+      <p class="film-synopsis">Dans son atelier envahi de bobines et de souvenirs, un restaurateur de films découvre une œuvre incomplète aux images énigmatiques. Peu à peu obsédé, il se laisse engloutir par la pellicule, jusqu'à ce qu'une présence mystérieuse lui tende la main, à la frontière du rêve et de la réalité.</p>
+      <div class="film-suite">
+        <div class="film-suite-line"></div>
+        <span>Actuellement en production</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MISSION -->
+<section class="mission" id="mission">
+  <div class="mission-inner">
+    <div>
+      <p class="section-label reveal">Notre mission</p>
+      <h2 class="section-title reveal d1">Faire<br>émerger<br>les voix<br>de demain</h2>
+      <div class="divider reveal d2"></div>
+    </div>
+    <div class="reveal d1">
+      <div class="mission-body">
+        <p>Mimidou Productions est une <strong>association loi 1901</strong> fondée par Hadrien Corsi, dédiée à la production de courts métrages. Notre vocation est d'offrir un cadre structurant et bienveillant aux jeunes cinéastes qui souhaitent concrétiser leurs projets, qu'il s'agisse de <strong>fiction</strong> ou de <strong>documentaire</strong>.</p>
+        <p>Nous accompagnons chaque réalisateur et réalisatrice de l'écriture jusqu'à la post-production, en apportant notre expertise technique, artistique et administrative pour que chaque projet puisse voir le jour dans les meilleures conditions.</p>
+      </div>
+      <p class="mission-quote">Chaque histoire mérite d'être racontée.</p>
+    </div>
+  </div>
+
+  <div class="valeurs-grid">
+    <div class="valeur-card reveal">
+      <div class="valeur-num">01</div>
+      <div class="valeur-titre">Accompagnement</div>
+      <p class="valeur-text">Un suivi personnalisé à chaque étape du projet, du scénario à la diffusion.</p>
+    </div>
+    <div class="valeur-card reveal d1">
+      <div class="valeur-num">02</div>
+      <div class="valeur-titre">Liberté artistique</div>
+      <p class="valeur-text">Nous croyons en la vision du réalisateur. Notre rôle est de la servir, pas de la contraindre.</p>
+    </div>
+    <div class="valeur-card reveal d2">
+      <div class="valeur-num">03</div>
+      <div class="valeur-titre">Exigence</div>
+      <p class="valeur-text">Un engagement total pour une qualité de production à la hauteur des ambitions créatives.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ÉQUIPE -->
+<section class="equipe" id="equipe">
+  <div class="equipe-inner">
+    <p class="section-label reveal">L'équipe</p>
+    <h2 class="section-title reveal d1">Ceux qui<br>portent<br>les projets</h2>
+    <div class="divider reveal d2"></div>
+
+    <div class="equipe-grid">
+
+      <!-- Hadrien Corsi -->
+      <div class="membre reveal">
+        <div class="portrait" id="portrait-hadrien">
+          <!--
+            REMPLACER PAR UNE PHOTO :
+            Supprime la ligne <div class="portrait-initials">HC</div>
+            et mets à la place :
+            <img src="hadrien.jpg" alt="Hadrien Corsi">
+            Le fichier doit être dans le même dossier que index.html.
+          -->
+          <div class="portrait-initials">HC</div>
+        </div>
+        <div>
+          <h3 class="membre-name">Hadrien<br>Corsi</h3>
+          <p class="membre-role or">Président et Producteur</p>
+          <p class="membre-bio">Fondateur de Mimidou Productions, Hadrien Corsi accompagne les jeunes cinéastes de l'écriture jusqu'à la diffusion. Sa conviction : créer un espace où l'ambition artistique peut s'exprimer sans les barrières habituelles de l'industrie.</p>
+        </div>
+      </div>
+
+      <!-- Lou Morana -->
+      <div class="membre reveal d1">
+        <div class="portrait violet" id="portrait-lou">
+          <!--
+            REMPLACER PAR UNE PHOTO :
+            Supprime la ligne <div class="portrait-initials">LM</div>
+            et mets à la place :
+            <img src="lou.jpg" alt="Lou Morana">
+            Le fichier doit être dans le même dossier que index.html.
+          -->
+          <div class="portrait-initials">LM</div>
+        </div>
+        <div>
+          <h3 class="membre-name">Lou<br>Morana</h3>
+          <p class="membre-role violet">Vice-présidente</p>
+          <p class="membre-bio">Étudiante en double diplôme de droit franco-anglais entre l'Université de Kent et Aix-Marseille Université, Lou Morana aspire à une spécialisation dans le droit du marché de l'art. Certifiée en Arts and Heritage Management par l'Università Bocconi, elle apporte à Mimidou Productions une sensibilité artistique et une rigueur juridique au service des projets portés par l'association.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="contact" id="contact">
+  <div class="contact-inner">
+    <p class="section-label reveal">Travailler avec nous</p>
+    <h2 class="section-title reveal d1">Vous avez<br>un projet ?</h2>
+    <div class="divider reveal d2" style="margin-left:auto;margin-right:auto;"></div>
+    <p class="contact-sub reveal d2">Parlez-nous de votre court métrage, fiction ou documentaire.</p>
+    <a href="mailto:contact@mimidouproductions.fr" class="btn-contact reveal d3">Nous contacter</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <a href="#" class="footer-logo">
+    <span class="footer-mimidou">MIMIDOU</span>
+    <div class="footer-prod-row">
+      <div class="footer-prod-line"></div>
+      <span class="footer-prod-text">PRODUCTIONS</span>
+      <div class="footer-prod-line"></div>
+    </div>
+  </a>
+  <p>© 2025 Mimidou Productions · Association loi 1901</p>
+  <p>Paris, France</p>
+</footer>
+
+<script>
+  const cur = document.getElementById('cursor');
+  const ring = document.getElementById('cring');
+  let mx=0,my=0,rx=0,ry=0;
+  document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; });
+  (function tick(){
+    cur.style.left=mx+'px'; cur.style.top=my+'px';
+    rx+=(mx-rx)*.12; ry+=(my-ry)*.12;
+    ring.style.left=rx+'px'; ring.style.top=ry+'px';
+    requestAnimationFrame(tick);
+  })();
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+</script>
+</body>
+</html>
